@@ -1,0 +1,12 @@
+{
+    "name": "ble_interface",
+    "description": "bluetooth_interface",
+    "version": "0.0.1",
+    "dependencies": {},
+    "node-red": {
+        "settings": {
+            "flowFile": "ble_interface.json",
+            "credentialsFile": "ble_interface_cred.json"
+        }
+    }
+}
