@@ -1,13 +1,5 @@
 [
     {
-        "id": "2df1dfd158b253ed",
-        "type": "tab",
-        "label": "Flow 2",
-        "disabled": true,
-        "info": "",
-        "env": []
-    },
-    {
         "id": "f7a852575a507e30",
         "type": "tab",
         "label": "Flow 1",
@@ -78,52 +70,144 @@
         "sessionExpiry": ""
     },
     {
-        "id": "5504d7e57750a247",
-        "type": "mqtt in",
-        "z": "2df1dfd158b253ed",
-        "name": "sensor_data",
-        "topic": "zigbee2mqtt/0x404ccafffe513a60",
-        "qos": "1",
-        "datatype": "auto-detect",
-        "broker": "9355c4bbb1adc9e0",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 170,
-        "y": 260,
+        "id": "8b5eb2f1c770a105",
+        "type": "pythonshell in",
+        "z": "f7a852575a507e30",
+        "name": "humidity",
+        "pyfile": "/home/waelkh12/ble_esp32.py",
+        "virtualenv": "",
+        "continuous": true,
+        "stdInData": false,
+        "x": 60,
+        "y": 240,
         "wires": [
             [
-                "fe464b47c0eff2b8",
-                "7a219abcac0d9d02"
+                "beb41cc912f41cc6",
+                "8c79dfb9635bfca3",
+                "eda7e98a63d3a7c7"
             ]
         ]
     },
     {
-        "id": "fe464b47c0eff2b8",
-        "type": "function",
-        "z": "2df1dfd158b253ed",
-        "name": "get_humidity_from_mqtt",
-        "func": "msg.payload= msg.payload.humidity;\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 410,
-        "y": 320,
-        "wires": [
-            [
-                "de144343b10bcc1d"
-            ]
-        ]
-    },
-    {
-        "id": "e4a68ecef4f0edcc",
+        "id": "beb41cc912f41cc6",
         "type": "debug",
-        "z": "2df1dfd158b253ed",
-        "name": "temp_humidity_vals",
+        "z": "f7a852575a507e30",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 260,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "8c79dfb9635bfca3",
+        "type": "string",
+        "z": "f7a852575a507e30",
+        "name": "",
+        "methods": [
+            {
+                "name": "between",
+                "params": [
+                    {
+                        "type": "str",
+                        "value": "temp"
+                    },
+                    {
+                        "type": "str",
+                        "value": "\\x"
+                    }
+                ]
+            }
+        ],
+        "prop": "payload",
+        "propout": "payload",
+        "object": "msg",
+        "objectout": "msg",
+        "x": 290,
+        "y": 140,
+        "wires": [
+            [
+                "084417715251d3d6",
+                "081931b6edc97dad"
+            ]
+        ]
+    },
+    {
+        "id": "084417715251d3d6",
+        "type": "debug",
+        "z": "f7a852575a507e30",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "eda7e98a63d3a7c7",
+        "type": "string",
+        "z": "f7a852575a507e30",
+        "name": "",
+        "methods": [
+            {
+                "name": "between",
+                "params": [
+                    {
+                        "type": "str",
+                        "value": "temp 19.30 \\xc2\\xb0C\\x00\\x00\\x00\\x00\\x00\\x00' b'Humidity   "
+                    },
+                    {
+                        "type": "str",
+                        "value": "%\\x"
+                    }
+                ]
+            }
+        ],
+        "prop": "payload",
+        "propout": "payload",
+        "object": "msg",
+        "objectout": "msg",
+        "x": 270,
+        "y": 340,
+        "wires": [
+            [
+                "abe2a069eb55f85c",
+                "dcbea2b09aabcdb8"
+            ]
+        ]
+    },
+    {
+        "id": "abe2a069eb55f85c",
+        "type": "debug",
+        "z": "f7a852575a507e30",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "d277eafa14bfd278",
+        "type": "debug",
+        "z": "f7a852575a507e30",
+        "name": "temperature_global_variable",
         "active": true,
         "tosidebar": true,
         "console": false,
@@ -133,53 +217,13 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1040,
-        "y": 240,
+        "y": 160,
         "wires": []
     },
     {
-        "id": "7a219abcac0d9d02",
+        "id": "d8a68157fd733884",
         "type": "function",
-        "z": "2df1dfd158b253ed",
-        "name": "get_temp_from_mqtt",
-        "func": "msg.payload= msg.payload.temperature;\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 420,
-        "y": 200,
-        "wires": [
-            [
-                "3af0fa44188c14b9"
-            ]
-        ]
-    },
-    {
-        "id": "de144343b10bcc1d",
-        "type": "function",
-        "z": "2df1dfd158b253ed",
-        "name": "set humidity as global variable",
-        "func": "global.set(\"humidity\", msg.payload);\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 690,
-        "y": 320,
-        "wires": [
-            [
-                "e4a68ecef4f0edcc"
-            ]
-        ]
-    },
-    {
-        "id": "3af0fa44188c14b9",
-        "type": "function",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "set temperature as global variable",
         "func": "global.set(\"temperature\", msg.payload);\nreturn msg;",
         "outputs": 1,
@@ -188,18 +232,95 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 680,
-        "y": 200,
+        "x": 540,
+        "y": 240,
         "wires": [
             [
-                "e4a68ecef4f0edcc"
+                "d277eafa14bfd278"
             ]
         ]
     },
     {
-        "id": "24d19c09ccd96cac",
+        "id": "081931b6edc97dad",
+        "type": "function",
+        "z": "f7a852575a507e30",
+        "name": "Convert temperature to number",
+        "func": "msg.payload = parseFloat(msg.payload); // Convert string to float\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 180,
+        "wires": [
+            [
+                "d8a68157fd733884"
+            ]
+        ]
+    },
+    {
+        "id": "dcbea2b09aabcdb8",
+        "type": "function",
+        "z": "f7a852575a507e30",
+        "name": "convert humidity to a number",
+        "func": "msg.payload = parseFloat(msg.payload); // Convert string to float\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 340,
+        "wires": [
+            [
+                "a68146fd61896e57"
+            ]
+        ]
+    },
+    {
+        "id": "a68146fd61896e57",
+        "type": "function",
+        "z": "f7a852575a507e30",
+        "name": "set humidity as global variable",
+        "func": "global.set(\"humidity\", msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 340,
+        "wires": [
+            [
+                "7b08a757d74ab51e"
+            ]
+        ]
+    },
+    {
+        "id": "7b08a757d74ab51e",
+        "type": "debug",
+        "z": "f7a852575a507e30",
+        "name": "humidity_global_variable",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 950,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "40d3ab383a7174d9",
         "type": "inject",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "",
         "props": [
             {
@@ -221,14 +342,14 @@
         "y": 1020,
         "wires": [
             [
-                "34660c95bc35a27d"
+                "ec7d5f96c5d17087"
             ]
         ]
     },
     {
-        "id": "34660c95bc35a27d",
+        "id": "ec7d5f96c5d17087",
         "type": "function",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "Get global variables",
         "func": "flow.set('Temperature', global.get(\"temperature\"));\nflow.set('Humidity', global.get(\"humidity\"));\nflow.set('tempecriticalvl', global.get(\"critical_temperature\"))\nflow.set('humiditycriticalvl', global.get(\"critical_humditiy\"))\nmsg.payload = [\n\nflow.get('Temperature'),\nflow.get('Humidity'),\nflow.get('tempecriticalvl'),\nflow.get('humiditycriticalvl')\n\n];\nreturn msg;",
         "outputs": 1,
@@ -241,14 +362,14 @@
         "y": 1020,
         "wires": [
             [
-                "e0289d94ffdc6595"
+                "c4f17f2752f86c02"
             ]
         ]
     },
     {
-        "id": "e0289d94ffdc6595",
+        "id": "c4f17f2752f86c02",
         "type": "debug",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "global variables array",
         "active": true,
         "tosidebar": true,
@@ -263,9 +384,9 @@
         "wires": []
     },
     {
-        "id": "ef89c69c7929cec3",
+        "id": "ebb4b39d37faf46e",
         "type": "opcua-compact-server",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "port": "4840",
         "endpoint": "",
         "productUri": "",
@@ -303,9 +424,9 @@
         "wires": []
     },
     {
-        "id": "e6a1fbafa5a9d894",
+        "id": "ecad05a705fec415",
         "type": "function",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "Check Temperature and Humidity",
         "func": "// Define the acceptable range for temperature and humidity\nconst minTemperature = 10; // Minimum temperature\nconst maxTemperature = 20; // Maximum temperature\nconst criticatemp = 20; // critical temperature \nconst minHumidity = 30;    // Minimum humidity\nconst maxHumidity = 40;    // Maximum humidity\nconst critichumidity =80; // critical value for humidity\n// Get the incoming message payload\nvar temperature = global.get('temperature'); // Get temperature from global context\nvar humidity = global.get('humidity'); // Get humidity from global context\n// set global variables that can be used by opc_server\n\n\n// Initialize payload as a JSON object\nvar  data = {\n    timestamp: Date.now(),\n    temperature: temperature,\n    humidity: humidity,\n    criticalhumidity : false,\n    criticaltemp : false,\n    temperatureEvent: \"\",\n    humidityEvent: \"\",\n    turnAC: false // Initialize turn AC variable\n};\n\n\n// Check if temperature is within the acceptable range\nif (temperature < minTemperature) {\n    // Temperature is below the acceptable range\n    data.temperatureEvent = \"Below Min\";\n} else if (temperature > maxTemperature) {\n    // Temperature is above the acceptable range\n    data.temperatureEvent = \"Above Max\";\n    \n}\nelse if (temperature > criticatemp) {\n    // Humidity is above the acceptable range\n    data.criticaltemp= true;\n    }\nelse {\n        msg.payload.temperatureEvent = \"No action\"\n    }\n// Check if humidity is within the acceptable range\nif (humidity < minHumidity) {\n    // Humidity is below the acceptable range\n    data.humidityEvent = \"Below Min\";\n} else if (humidity > maxHumidity) {\n    // Humidity is above the acceptable range\n    data.humidityEvent = \"Above Max\";\n    }\n    \n\nelse {\n        data.humidityEvent = \"No action\"\n    }\n\n// Set turn AC variable based on conditions\nif (data.temperatureEvent === \"Above Max\" || data.humidityEvent === \"Above Max\" || data.criticaltemp==true) {\n    data.turnAC = true; // Turn on AC\n} else {\n    data.turnAC = false; // Turn off AC\n}\n\n\n\n// Return message\nreturn {payload: data};",
         "outputs": 1,
@@ -318,18 +439,18 @@
         "y": 660,
         "wires": [
             [
-                "3b3b31131b8fdace",
-                "5f88eb2715f67f2e",
-                "4e4eab1d17ba667b",
-                "e858ed400a2da5cc",
-                "2bf7a4c1a64f3644"
+                "c30f220d9f8f57af",
+                "2e2d11dc8c879b17",
+                "de607af13c5134a0",
+                "20c1b3c67b6dcd17",
+                "fa107051b12614c0"
             ]
         ]
     },
     {
-        "id": "3b3b31131b8fdace",
+        "id": "c30f220d9f8f57af",
         "type": "csv",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "",
         "sep": ",",
         "hdrin": true,
@@ -345,14 +466,14 @@
         "y": 660,
         "wires": [
             [
-                "98043526b951ff73"
+                "4eecbf50ba453b9f"
             ]
         ]
     },
     {
-        "id": "98043526b951ff73",
+        "id": "4eecbf50ba453b9f",
         "type": "file",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "d": true,
         "name": "",
         "filename": "C:\\Users\\waelk\\Desktop\\test.csv",
@@ -368,9 +489,9 @@
         ]
     },
     {
-        "id": "874772e5613c7c97",
+        "id": "f9bc82a6ad3ddf13",
         "type": "inject",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "Simulate Data",
         "props": [
             {
@@ -388,14 +509,14 @@
         "y": 660,
         "wires": [
             [
-                "e6a1fbafa5a9d894"
+                "ecad05a705fec415"
             ]
         ]
     },
     {
-        "id": "5f88eb2715f67f2e",
+        "id": "2e2d11dc8c879b17",
         "type": "debug",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "object containing_data_and_events",
         "active": true,
         "tosidebar": true,
@@ -410,9 +531,9 @@
         "wires": []
     },
     {
-        "id": "3c9125f52dbd20b9",
+        "id": "bfb44c309a89d080",
         "type": "comment",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "sending notifications to2",
         "info": "",
         "x": 100,
@@ -420,9 +541,9 @@
         "wires": []
     },
     {
-        "id": "4e4eab1d17ba667b",
+        "id": "de607af13c5134a0",
         "type": "function",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "check_critical_temperature_trigger",
         "func": "var inputObject = msg.payload;\n\nvar criticalTemperature = inputObject.criticaltemp;\nvar criticalHumidity = inputObject.criticalhumidity;\n\nif (criticalTemperature || criticalHumidity) {\n    // If either critical temperature or critical humidity is true\n    msg.payload = \"Critical temperature or humidity condition is met.\";\n    return msg;\n} else {\n    // If neither critical temperature nor critical humidity is true\n    msg.payload = \"Critical conditions are not met.\";\n}\n\n",
         "outputs": 1,
@@ -435,15 +556,15 @@
         "y": 820,
         "wires": [
             [
-                "213873f1f694ec7c",
-                "be57ed18809f8271"
+                "e61c7fc50d9f5291",
+                "3b85f7b094d655e3"
             ]
         ]
     },
     {
-        "id": "213873f1f694ec7c",
+        "id": "e61c7fc50d9f5291",
         "type": "debug",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "trigger_conditions",
         "active": true,
         "tosidebar": true,
@@ -458,9 +579,9 @@
         "wires": []
     },
     {
-        "id": "be57ed18809f8271",
+        "id": "3b85f7b094d655e3",
         "type": "e-mail",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "server": "smtp.gmail.com",
         "port": "465",
         "authtype": "BASIC",
@@ -475,9 +596,9 @@
         "wires": []
     },
     {
-        "id": "962ca721c5d4e4ed",
+        "id": "466f2a15f7ea6ef4",
         "type": "comment",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "OPC_UA_SERVER",
         "info": "",
         "x": 90,
@@ -485,9 +606,9 @@
         "wires": []
     },
     {
-        "id": "982085d1f24edf80",
+        "id": "d567823a7b9e07a5",
         "type": "comment",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "LOGIC_ENGINE",
         "info": "",
         "x": 80,
@@ -495,19 +616,9 @@
         "wires": []
     },
     {
-        "id": "dbaa9f0e24489285",
-        "type": "comment",
-        "z": "2df1dfd158b253ed",
-        "name": "zigbee_interface",
-        "info": "",
-        "x": 80,
-        "y": 80,
-        "wires": []
-    },
-    {
-        "id": "e858ed400a2da5cc",
+        "id": "20c1b3c67b6dcd17",
         "type": "function",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "set temperature event as global var",
         "func": "msg.payload= msg.payload.criticaltemp;\nglobal.set(\"critical_temperature\", msg.payload);\n\nreturn msg;",
         "outputs": 1,
@@ -520,14 +631,14 @@
         "y": 560,
         "wires": [
             [
-                "e2bb7f5d9a0715e0"
+                "89709a80b5152bb9"
             ]
         ]
     },
     {
-        "id": "e2bb7f5d9a0715e0",
+        "id": "89709a80b5152bb9",
         "type": "debug",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "temp_event",
         "active": true,
         "tosidebar": true,
@@ -542,9 +653,9 @@
         "wires": []
     },
     {
-        "id": "2bf7a4c1a64f3644",
+        "id": "fa107051b12614c0",
         "type": "function",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "set humidity event as global var",
         "func": "msg.payload= msg.payload.criticalhumidity;\nglobal.set(\"critical_humidity\", msg.payload);\n\nreturn msg;\nreturn msg;",
         "outputs": 1,
@@ -557,14 +668,14 @@
         "y": 480,
         "wires": [
             [
-                "29f50b54201f70c3"
+                "1fa402145eb0e69a"
             ]
         ]
     },
     {
-        "id": "29f50b54201f70c3",
+        "id": "1fa402145eb0e69a",
         "type": "debug",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "humd_event",
         "active": true,
         "tosidebar": true,
@@ -579,9 +690,9 @@
         "wires": []
     },
     {
-        "id": "53c78b710282cbfb",
+        "id": "7980a2a5b89e84e5",
         "type": "comment",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "mqtt interface",
         "info": "",
         "x": 70,
@@ -589,9 +700,9 @@
         "wires": []
     },
     {
-        "id": "92e00a55170fe173",
+        "id": "5282dfda6620b9fb",
         "type": "inject",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "Simulate Data",
         "props": [
             {
@@ -609,14 +720,14 @@
         "y": 1260,
         "wires": [
             [
-                "e41b408c490a13dd"
+                "0fe35d1b2a540832"
             ]
         ]
     },
     {
-        "id": "e41b408c490a13dd",
+        "id": "0fe35d1b2a540832",
         "type": "function",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "Check Temperature and Humidity",
         "func": "// Define the acceptable range for temperature and humidity\nconst minTemperature = 10; // Minimum temperature\nconst maxTemperature = 20; // Maximum temperature\nconst criticatemp = 20; // critical temperature \nconst minHumidity = 30;    // Minimum humidity\nconst maxHumidity = 40;    // Maximum humidity\nconst critichumidity =80; // critical value for humidity\n// Get the incoming message payload\nvar temperature = global.get('temperature'); // Get temperature from global context\nvar humidity = global.get('humidity'); // Get humidity from global context\n// set global variables that can be used by opc_server\n\n\n// Initialize payload as a JSON object\nvar  data = {\n    timestamp: Date.now(),\n    temperature: temperature,\n    humidity: humidity,\n    criticalhumidity : false,\n    criticaltemp : false,\n    temperatureEvent: \"\",\n    humidityEvent: \"\",\n    turnAC: false // Initialize turn AC variable\n};\n\n\n// Check if temperature is within the acceptable range\nif (temperature < minTemperature) {\n    // Temperature is below the acceptable range\n    data.temperatureEvent = \"Below Min\";\n} else if (temperature > maxTemperature) {\n    // Temperature is above the acceptable range\n    data.temperatureEvent = \"Above Max\";\n    \n}\nelse if (temperature > criticatemp) {\n    // Humidity is above the acceptable range\n    data.criticaltemp= true;\n    }\nelse {\n        msg.payload.temperatureEvent = \"No action\"\n    }\n// Check if humidity is within the acceptable range\nif (humidity < minHumidity) {\n    // Humidity is below the acceptable range\n    data.humidityEvent = \"Below Min\";\n} else if (humidity > maxHumidity) {\n    // Humidity is above the acceptable range\n    data.humidityEvent = \"Above Max\";\n    }\n    \n\nelse {\n        data.humidityEvent = \"No action\"\n    }\n\n// Set turn AC variable based on conditions\nif (data.temperatureEvent === \"Above Max\" || data.humidityEvent === \"Above Max\" || data.criticaltemp==true) {\n    data.turnAC = true; // Turn on AC\n} else {\n    data.turnAC = false; // Turn off AC\n}\n\n\n\n// Return message\nreturn {payload: data};",
         "outputs": 1,
@@ -629,14 +740,14 @@
         "y": 1260,
         "wires": [
             [
-                "ad75dfa6a5ee9102"
+                "c1091735ca285d69"
             ]
         ]
     },
     {
-        "id": "ad75dfa6a5ee9102",
+        "id": "c1091735ca285d69",
         "type": "mqtt out",
-        "z": "2df1dfd158b253ed",
+        "z": "f7a852575a507e30",
         "name": "",
         "topic": "sensordata",
         "qos": "",
@@ -652,37 +763,13 @@
         "wires": []
     },
     {
-        "id": "8b5eb2f1c770a105",
-        "type": "pythonshell in",
+        "id": "f6bf295aa617b02b",
+        "type": "comment",
         "z": "f7a852575a507e30",
-        "d": true,
-        "name": "humidity",
-        "pyfile": "/home/waelkh12/ble_esp32.py",
-        "virtualenv": "",
-        "continuous": true,
-        "stdInData": false,
-        "x": 400,
-        "y": 320,
-        "wires": [
-            [
-                "beb41cc912f41cc6"
-            ]
-        ]
-    },
-    {
-        "id": "beb41cc912f41cc6",
-        "type": "debug",
-        "z": "f7a852575a507e30",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 640,
-        "y": 320,
+        "name": "bluetooth_interface",
+        "info": "",
+        "x": 90,
+        "y": 40,
         "wires": []
     }
 ]
