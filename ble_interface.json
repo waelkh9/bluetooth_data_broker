@@ -886,11 +886,12 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 710,
+        "x": 600,
         "y": 1380,
         "wires": [
             [
-                "80ea49b43e3c0010"
+                "80ea49b43e3c0010",
+                "497b1fcd6874f3ab"
             ]
         ]
     },
@@ -907,6 +908,24 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 980,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "497b1fcd6874f3ab",
+        "type": "mqtt out",
+        "z": "f7a852575a507e30",
+        "name": "",
+        "topic": "command_access_control",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "ff246c28cc0fa0af",
+        "x": 930,
         "y": 1380,
         "wires": []
     }
