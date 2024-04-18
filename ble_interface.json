@@ -42,7 +42,7 @@
         "id": "ff246c28cc0fa0af",
         "type": "mqtt-broker",
         "name": "mqtt_broker",
-        "broker": "mqtt://192.168.1.105",
+        "broker": "mqtt://192.168.1.102",
         "port": "1883",
         "clientid": "",
         "autoConnect": true,
@@ -351,7 +351,7 @@
         "type": "function",
         "z": "f7a852575a507e30",
         "name": "Get global variables",
-        "func": "flow.set('Temperature', global.get(\"temperature\"));\nflow.set('Humidity', global.get(\"humidity\"));\nflow.set('tempecriticalvl', global.get(\"critical_temperature\"))\nflow.set('humiditycriticalvl', global.get(\"critical_humditiy\"))\nmsg.payload = [\n\nflow.get('Temperature'),\nflow.get('Humidity'),\nflow.get('tempecriticalvl'),\nflow.get('humiditycriticalvl')\n\n];\nreturn msg;",
+        "func": "flow.set('Temperature', global.get(\"temperature\"));\nflow.set('Humidity', global.get(\"humidity\"));\nflow.set('tempecriticalvl', global.get(\"critical_temperature\"))\nflow.set('humiditycriticalvl', global.get(\"critical_humditiy\"))\nflow.set('access', global.get(\"access\"))\n\nmsg.payload = [\n\nflow.get('Temperature'),\nflow.get('Humidity'),\nflow.get('tempecriticalvl'),\nflow.get('humiditycriticalvl'),\nflow.get('access')\n];\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -418,7 +418,7 @@
         "delayToInit": 1000,
         "delayToClose": 200,
         "serverShutdownTimeout": 100,
-        "addressSpaceScript": "function constructAlarmAddressSpace(server, addressSpace, eventObjects, done) {\n  // server = the created node-opcua server\n  // addressSpace = address space of the node-opcua server\n  // eventObjects = add event variables here to hold them in memory from this script\n\n  // internal sandbox objects are:\n  // node = the compact server node,\n  // coreServer = core compact server object for debug and access to NodeOPCUA\n  // this.sandboxNodeContext = node context node-red\n  // this.sandboxFlowContext = flow context node-red\n  // this.sandboxGlobalContext = global context node-red\n  // this.sandboxEnv = env variables\n  // timeout and interval functions as expected from nodejs\n\n  \n  const opcua = coreServer.choreCompact.opcua;\n  const LocalizedText = opcua.LocalizedText;\n  const namespace = addressSpace.getOwnNamespace();\n\n  const Variant = opcua.Variant;\n  const DataType = opcua.DataType;\n  const DataValue = opcua.DataValue;\n\n  var flexServerInternals = this;\n\n  \n  const rootFolder = addressSpace.findNode(\"RootFolder\");\n\n  this.sandboxFlowContext.set(\"Humidity\", false);\n  this.sandboxFlowContext.set(\"Temperature\", false);\n  this.sandboxFlowContext.set(\"critical_temperature\", false);\n  this.sandboxFlowContext.set(\"critical_humidity\", false);\n\n  const sensor_Data = namespace.addFolder(rootFolder.objects, {\n    \"browseName\": \"Sensor_data\"\n  });\n  const temperature = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"temperature\"\n  });\n  const humidity = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"humidity\"\n  });\n  const temperature_float = namespace.addFolder(temperature, {\n    \"browseName\": \"Float_C\"\n  });\n  const humidity_float = namespace.addFolder(humidity, {\n    \"browseName\": \"humidity_%\"\n  });\n  const tempCritical = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"Temp_critical\"\n  });\n  const humidityCritical = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"Humidity_critical\"\n  });\n  const temperature_var = namespace.addVariable({\n    \"organizedBy\": temperature_float,\n    \"browseName\": \"temperature\",\n    \"nodeId\": \"ns=1;s=Temperature_value\",\n    \"dataType\": \"Double\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Double,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"Temperature\")\n        });\n      },\n      \"set\": function (Variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"Temperature\",\n          Variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n  const humidity_var = namespace.addVariable({\n    \"organizedBy\": humidity_float,\n    \"browseName\": \"Humidity\",\n    \"nodeId\": \"ns=1;s=Humidity_value\",\n    \"dataType\": \"Double\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Double,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"Humidity\")\n        });\n      },\n      \"set\": function (Variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"Humidity\",\n          Variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n    const temperatureCritical = namespace.addVariable({\n    \"organizedBy\": tempCritical,\n    \"browseName\": \"Value\",\n    \"nodeId\": \"ns=1;s=Temp_critical_value\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"critical_temperature\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"critical_temperature\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n\n  const humidityCrit = namespace.addVariable({\n    \"organizedBy\": humidityCritical,\n    \"browseName\": \"Value\",\n    \"nodeId\": \"ns=1;s=Humidity_critical_value\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"critical_humidity\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"critical_humidity\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n\n  \n  done();\n}",
+        "addressSpaceScript": "function constructAlarmAddressSpace(server, addressSpace, eventObjects, done) {\n  // server = the created node-opcua server\n  // addressSpace = address space of the node-opcua server\n  // eventObjects = add event variables here to hold them in memory from this script\n\n  // internal sandbox objects are:\n  // node = the compact server node,\n  // coreServer = core compact server object for debug and access to NodeOPCUA\n  // this.sandboxNodeContext = node context node-red\n  // this.sandboxFlowContext = flow context node-red\n  // this.sandboxGlobalContext = global context node-red\n  // this.sandboxEnv = env variables\n  // timeout and interval functions as expected from nodejs\n\n  \n  const opcua = coreServer.choreCompact.opcua;\n  const LocalizedText = opcua.LocalizedText;\n  const namespace = addressSpace.getOwnNamespace();\n\n  const Variant = opcua.Variant;\n  const DataType = opcua.DataType;\n  const DataValue = opcua.DataValue;\n\n  var flexServerInternals = this;\n\n  \n  const rootFolder = addressSpace.findNode(\"RootFolder\");\n\n  this.sandboxFlowContext.set(\"Humidity\", false);\n  this.sandboxFlowContext.set(\"Temperature\", false);\n  this.sandboxFlowContext.set(\"critical_temperature\", false);\n  this.sandboxFlowContext.set(\"critical_humidity\", false);\n  this.sandboxFlowContext.set(\"access\", false);\n\n  const sensor_Data = namespace.addFolder(rootFolder.objects, {\n    \"browseName\": \"Sensor_data\"\n  });\n  const access_control = namespace.addFolder(rootFolder.objects, {\n    \"browseName\": \"access_control\"\n  });\n  const access = namespace.addFolder(access_control, {\n    \"browseName\": \"access_event\"\n  });\n  const temperature = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"temperature\"\n  });\n  const humidity = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"humidity\"\n  });\n  const temperature_float = namespace.addFolder(temperature, {\n    \"browseName\": \"Float_C\"\n  });\n  const humidity_float = namespace.addFolder(humidity, {\n    \"browseName\": \"humidity_%\"\n  });\n  const tempCritical = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"Temp_critical\"\n  });\n  const humidityCritical = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"Humidity_critical\"\n  });\n  const temperature_var = namespace.addVariable({\n    \"organizedBy\": temperature_float,\n    \"browseName\": \"temperature\",\n    \"nodeId\": \"ns=1;s=Temperature_value\",\n    \"dataType\": \"Double\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Double,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"Temperature\")\n        });\n      },\n      \"set\": function (Variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"Temperature\",\n          Variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n  const humidity_var = namespace.addVariable({\n    \"organizedBy\": humidity_float,\n    \"browseName\": \"Humidity\",\n    \"nodeId\": \"ns=1;s=Humidity_value\",\n    \"dataType\": \"Double\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Double,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"Humidity\")\n        });\n      },\n      \"set\": function (Variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"Humidity\",\n          Variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n    const temperatureCritical = namespace.addVariable({\n    \"organizedBy\": tempCritical,\n    \"browseName\": \"Value\",\n    \"nodeId\": \"ns=1;s=Temp_critical_value\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"critical_temperature\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"critical_temperature\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n\n  const humidityCrit = namespace.addVariable({\n    \"organizedBy\": humidityCritical,\n    \"browseName\": \"Value\",\n    \"nodeId\": \"ns=1;s=Humidity_critical_value\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"critical_humidity\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"critical_humidity\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n  const accessevent= namespace.addVariable({\n    \"organizedBy\": access_control,\n    \"browseName\": \"Value\",\n    \"nodeId\": \"ns=1;s=accessevent\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"access\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"access\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n\n  \n  done();\n}",
         "x": 540,
         "y": 1120,
         "wires": []
@@ -770,6 +770,144 @@
         "info": "",
         "x": 90,
         "y": 40,
+        "wires": []
+    },
+    {
+        "id": "dedbc6e23317279f",
+        "type": "comment",
+        "z": "f7a852575a507e30",
+        "name": "access control",
+        "info": "",
+        "x": 70,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "31ec4c45c73f9a62",
+        "type": "pythonshell in",
+        "z": "f7a852575a507e30",
+        "name": "acces_control",
+        "pyfile": "/home/waelkh12/Desktop/tf_lite_face_reco/facial_recognition_for_access_control/test_model/use_tflite.py",
+        "virtualenv": "",
+        "continuous": false,
+        "stdInData": false,
+        "x": 500,
+        "y": 1500,
+        "wires": [
+            [
+                "c393e69e192ddee4",
+                "d9719971f74795d2"
+            ]
+        ]
+    },
+    {
+        "id": "0b4cd8f300dba0f0",
+        "type": "mqtt in",
+        "z": "f7a852575a507e30",
+        "name": "",
+        "topic": "command_access_control",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "ff246c28cc0fa0af",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 1440,
+        "wires": [
+            [
+                "387370e20971acb9",
+                "4647ed22238b30a5"
+            ]
+        ]
+    },
+    {
+        "id": "387370e20971acb9",
+        "type": "debug",
+        "z": "f7a852575a507e30",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 300,
+        "y": 1540,
+        "wires": []
+    },
+    {
+        "id": "c393e69e192ddee4",
+        "type": "debug",
+        "z": "f7a852575a507e30",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "4647ed22238b30a5",
+        "type": "function",
+        "z": "f7a852575a507e30",
+        "name": "function 1",
+        "func": "if (msg.payload= true) {\nreturn msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 1360,
+        "wires": [
+            [
+                "31ec4c45c73f9a62"
+            ]
+        ]
+    },
+    {
+        "id": "d9719971f74795d2",
+        "type": "function",
+        "z": "f7a852575a507e30",
+        "name": "function 2",
+        "func": "global.set(\"access\", msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 1380,
+        "wires": [
+            [
+                "80ea49b43e3c0010"
+            ]
+        ]
+    },
+    {
+        "id": "80ea49b43e3c0010",
+        "type": "debug",
+        "z": "f7a852575a507e30",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 1380,
         "wires": []
     }
 ]
