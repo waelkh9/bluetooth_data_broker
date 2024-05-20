@@ -73,12 +73,12 @@
         "id": "8b5eb2f1c770a105",
         "type": "pythonshell in",
         "z": "f7a852575a507e30",
-        "name": "humidity",
+        "name": "sensor_data",
         "pyfile": "/home/waelkh12/ble_esp32.py",
         "virtualenv": "",
         "continuous": true,
         "stdInData": false,
-        "x": 60,
+        "x": 70,
         "y": 240,
         "wires": [
             [
@@ -318,7 +318,17 @@
         "wires": []
     },
     {
-        "id": "40d3ab383a7174d9",
+        "id": "f6bf295aa617b02b",
+        "type": "comment",
+        "z": "f7a852575a507e30",
+        "name": "bluetooth_interface",
+        "info": "",
+        "x": 90,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "551cc718db60ec28",
         "type": "inject",
         "z": "f7a852575a507e30",
         "name": "",
@@ -339,19 +349,19 @@
         "payload": "",
         "payloadType": "date",
         "x": 270,
-        "y": 1020,
+        "y": 1180,
         "wires": [
             [
-                "ec7d5f96c5d17087"
+                "7c5168613b18058c"
             ]
         ]
     },
     {
-        "id": "ec7d5f96c5d17087",
+        "id": "7c5168613b18058c",
         "type": "function",
         "z": "f7a852575a507e30",
         "name": "Get global variables",
-        "func": "flow.set('Temperature', global.get(\"temperature\"));\nflow.set('Humidity', global.get(\"humidity\"));\nflow.set('tempecriticalvl', global.get(\"critical_temperature\"))\nflow.set('humiditycriticalvl', global.get(\"critical_humditiy\"))\nflow.set('access', global.get(\"access\"))\n\nmsg.payload = [\n\nflow.get('Temperature'),\nflow.get('Humidity'),\nflow.get('tempecriticalvl'),\nflow.get('humiditycriticalvl'),\nflow.get('access')\n];\nreturn msg;",
+        "func": "flow.set('Temperature', global.get(\"temperature\"));\nflow.set('Humidity', global.get(\"humidity\"));\nflow.set('lux', global.get(\"lux\"));\nflow.set('tempecriticalvl', global.get(\"critical_temperature\"))\nflow.set('humiditycriticalvl', global.get(\"critical_humidity\"))\nflow.set('light_on', global.get(\"light_is_on\"))\nflow.set('light_off', global.get(\"light_is_off\"))\n\n\nmsg.payload = [\n\nflow.get('Temperature'),\nflow.get('Humidity'),\nflow.get('lux'),\nflow.get('tempecriticalvl'),\nflow.get('humiditycriticalvl'),\nflow.get('light_on'),\nflow.get('light_off')\n\n\n];\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -359,15 +369,15 @@
         "finalize": "",
         "libs": [],
         "x": 480,
-        "y": 1020,
+        "y": 1180,
         "wires": [
             [
-                "c4f17f2752f86c02"
+                "02e10733974ebc0a"
             ]
         ]
     },
     {
-        "id": "c4f17f2752f86c02",
+        "id": "02e10733974ebc0a",
         "type": "debug",
         "z": "f7a852575a507e30",
         "name": "global variables array",
@@ -380,11 +390,11 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 740,
-        "y": 1020,
+        "y": 1180,
         "wires": []
     },
     {
-        "id": "ebb4b39d37faf46e",
+        "id": "daeebc6c75047233",
         "type": "opcua-compact-server",
         "z": "f7a852575a507e30",
         "port": "4840",
@@ -407,7 +417,7 @@
         "publicCertificateFile": "",
         "privateCertificateFile": "",
         "registerServerMethod": "1",
-        "discoveryServerEndpointUrl": "opc.tcp://192.168.1.105:4840",
+        "discoveryServerEndpointUrl": "opc.tcp://192.168.1.102:4840",
         "capabilitiesForMDNS": "",
         "maxNodesPerRead": 1000,
         "maxNodesPerWrite": 1000,
@@ -418,17 +428,17 @@
         "delayToInit": 1000,
         "delayToClose": 200,
         "serverShutdownTimeout": 100,
-        "addressSpaceScript": "function constructAlarmAddressSpace(server, addressSpace, eventObjects, done) {\n  // server = the created node-opcua server\n  // addressSpace = address space of the node-opcua server\n  // eventObjects = add event variables here to hold them in memory from this script\n\n  // internal sandbox objects are:\n  // node = the compact server node,\n  // coreServer = core compact server object for debug and access to NodeOPCUA\n  // this.sandboxNodeContext = node context node-red\n  // this.sandboxFlowContext = flow context node-red\n  // this.sandboxGlobalContext = global context node-red\n  // this.sandboxEnv = env variables\n  // timeout and interval functions as expected from nodejs\n\n  \n  const opcua = coreServer.choreCompact.opcua;\n  const LocalizedText = opcua.LocalizedText;\n  const namespace = addressSpace.getOwnNamespace();\n\n  const Variant = opcua.Variant;\n  const DataType = opcua.DataType;\n  const DataValue = opcua.DataValue;\n\n  var flexServerInternals = this;\n\n  \n  const rootFolder = addressSpace.findNode(\"RootFolder\");\n\n  this.sandboxFlowContext.set(\"Humidity\", false);\n  this.sandboxFlowContext.set(\"Temperature\", false);\n  this.sandboxFlowContext.set(\"critical_temperature\", false);\n  this.sandboxFlowContext.set(\"critical_humidity\", false);\n  this.sandboxFlowContext.set(\"access\", false);\n\n  const sensor_Data = namespace.addFolder(rootFolder.objects, {\n    \"browseName\": \"Sensor_data\"\n  });\n  const access_control = namespace.addFolder(rootFolder.objects, {\n    \"browseName\": \"access_control\"\n  });\n  const access = namespace.addFolder(access_control, {\n    \"browseName\": \"access_event\"\n  });\n  const temperature = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"temperature\"\n  });\n  const humidity = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"humidity\"\n  });\n  const temperature_float = namespace.addFolder(temperature, {\n    \"browseName\": \"Float_C\"\n  });\n  const humidity_float = namespace.addFolder(humidity, {\n    \"browseName\": \"humidity_%\"\n  });\n  const tempCritical = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"Temp_critical\"\n  });\n  const humidityCritical = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"Humidity_critical\"\n  });\n  const temperature_var = namespace.addVariable({\n    \"organizedBy\": temperature_float,\n    \"browseName\": \"temperature\",\n    \"nodeId\": \"ns=1;s=Temperature_value\",\n    \"dataType\": \"Double\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Double,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"Temperature\")\n        });\n      },\n      \"set\": function (Variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"Temperature\",\n          Variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n  const humidity_var = namespace.addVariable({\n    \"organizedBy\": humidity_float,\n    \"browseName\": \"Humidity\",\n    \"nodeId\": \"ns=1;s=Humidity_value\",\n    \"dataType\": \"Double\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Double,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"Humidity\")\n        });\n      },\n      \"set\": function (Variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"Humidity\",\n          Variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n    const temperatureCritical = namespace.addVariable({\n    \"organizedBy\": tempCritical,\n    \"browseName\": \"Value\",\n    \"nodeId\": \"ns=1;s=Temp_critical_value\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"critical_temperature\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"critical_temperature\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n\n  const humidityCrit = namespace.addVariable({\n    \"organizedBy\": humidityCritical,\n    \"browseName\": \"Value\",\n    \"nodeId\": \"ns=1;s=Humidity_critical_value\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"critical_humidity\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"critical_humidity\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n  const accessevent= namespace.addVariable({\n    \"organizedBy\": access_control,\n    \"browseName\": \"Value\",\n    \"nodeId\": \"ns=1;s=accessevent\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"access\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"access\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n\n  \n  done();\n}",
+        "addressSpaceScript": "function constructAlarmAddressSpace(server, addressSpace, eventObjects, done) {\n  // server = the created node-opcua server\n  // addressSpace = address space of the node-opcua server\n  // eventObjects = add event variables here to hold them in memory from this script\n\n  // internal sandbox objects are:\n  // node = the compact server node,\n  // coreServer = core compact server object for debug and access to NodeOPCUA\n  // this.sandboxNodeContext = node context node-red\n  // this.sandboxFlowContext = flow context node-red\n  // this.sandboxGlobalContext = global context node-red\n  // this.sandboxEnv = env variables\n  // timeout and interval functions as expected from nodejs\n\n  \n  const opcua = coreServer.choreCompact.opcua;\n  const LocalizedText = opcua.LocalizedText;\n  const namespace = addressSpace.getOwnNamespace();\n\n  const Variant = opcua.Variant;\n  const DataType = opcua.DataType;\n  const DataValue = opcua.DataValue;\n\n  var flexServerInternals = this;\n\n  \n  const rootFolder = addressSpace.findNode(\"RootFolder\");\n\n  this.sandboxFlowContext.set(\"Humidity\", false);\n  this.sandboxFlowContext.set(\"Temperature\", false);\n  this.sandboxFlowContext.set(\"humiditycriticalvl\", false);\n  this.sandboxFlowContext.set(\"tempecriticalvl\", false);\n  this.sandboxFlowContext.set(\"light_on\", false);\n\n  this.sandboxFlowContext.set(\"access\", false);\n  this.sandboxFlowContext.set(\"illuminance\", false);\n\n\n  const sensor_Data = namespace.addFolder(rootFolder.objects, {\n    \"browseName\": \"Sensor_data\"\n  });\n  const access_control = namespace.addFolder(rootFolder.objects, {\n    \"browseName\": \"access_control\"\n  });\n  const access = namespace.addFolder(access_control, {\n    \"browseName\": \"access_event\"\n  });\n  const temperature = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"temperature\"\n  });\n  const humidity = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"humidity\"\n  });\n  const temperature_float = namespace.addFolder(temperature, {\n    \"browseName\": \"Float_C\"\n  });\n  const humidity_float = namespace.addFolder(humidity, {\n    \"browseName\": \"humidity_%\"\n  });\n  const tempCritical = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"Temp_critical\"\n  });\n  const humidityCritical = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"Humidity_critical\"\n  });\n   const light_on = namespace.addFolder(sensor_Data, {\n    \"browseName\": \"light_on\"\n  });\n  const illuminance = namespace.addFolder(sensor_Data, {\n  \"browseName\": \"illuminance\"\n  });\n  const temperature_var = namespace.addVariable({\n    \"organizedBy\": temperature_float,\n    \"browseName\": \"temperature\",\n    \"nodeId\": \"ns=1;s=Temperature_value\",\n    \"dataType\": \"Double\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Double,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"Temperature\")\n        });\n      },\n      \"set\": function (Variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"Temperature\",\n          Variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n  const humidity_var = namespace.addVariable({\n    \"organizedBy\": humidity_float,\n    \"browseName\": \"Humidity\",\n    \"nodeId\": \"ns=1;s=Humidity_value\",\n    \"dataType\": \"Double\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Double,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"Humidity\")\n        });\n      },\n      \"set\": function (Variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"Humidity\",\n          Variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n    const temperatureCritical = namespace.addVariable({\n    \"organizedBy\": tempCritical,\n    \"browseName\": \"critical_temperature\",\n    \"nodeId\": \"ns=1;s=Temp_critical_value\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"tempecriticalvl\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"tempecriticalvl\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n\n  const humidityCrit = namespace.addVariable({\n    \"organizedBy\": humidityCritical,\n    \"browseName\": \"critical_humidity\",\n    \"nodeId\": \"ns=1;s=Humidity_critical_value\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"humiditycriticalvl\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"humiditycriticalvl\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n  const light_on_event = namespace.addVariable({\n    \"organizedBy\": light_on,\n    \"browseName\": \"light_is_on\",\n    \"nodeId\": \"ns=1;s=light_is_on\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"light_on\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"light_on\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n  const accessevent= namespace.addVariable({\n    \"organizedBy\": access_control,\n    \"browseName\": \"Value\",\n    \"nodeId\": \"ns=1;s=accessevent\",\n    \"dataType\": \"Boolean\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Boolean,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"access\")\n        });\n      },\n      \"set\": function (variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"access\",\n          variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\nconst illuminance_var = namespace.addVariable({\n    \"organizedBy\": illuminance,\n    \"browseName\": \"illuminance\",\n    \"nodeId\": \"ns=1;s=illuminance_value\",\n    \"dataType\": \"Double\",\n    \"value\": {\n      \"get\": function () {\n        return new Variant({\n          \"dataType\": DataType.Double,\n          \"value\": flexServerInternals.sandboxFlowContext.get(\"lux\")\n        });\n      },\n      \"set\": function (Variant) {\n        flexServerInternals.sandboxFlowContext.set(\n          \"lux\",\n          Variant.value\n        );\n        return opcua.StatusCodes.Good;\n      }\n    }\n  });\n  \n  done();\n}",
         "x": 540,
-        "y": 1120,
+        "y": 1280,
         "wires": []
     },
     {
-        "id": "ecad05a705fec415",
+        "id": "1228e24583e175b4",
         "type": "function",
         "z": "f7a852575a507e30",
         "name": "Check Temperature and Humidity",
-        "func": "// Define the acceptable range for temperature and humidity\nconst minTemperature = 10; // Minimum temperature\nconst maxTemperature = 20; // Maximum temperature\nconst criticatemp = 20; // critical temperature \nconst minHumidity = 30;    // Minimum humidity\nconst maxHumidity = 40;    // Maximum humidity\nconst critichumidity =80; // critical value for humidity\n// Get the incoming message payload\nvar temperature = global.get('temperature'); // Get temperature from global context\nvar humidity = global.get('humidity'); // Get humidity from global context\n// set global variables that can be used by opc_server\n\n\n// Initialize payload as a JSON object\nvar  data = {\n    timestamp: Date.now(),\n    temperature: temperature,\n    humidity: humidity,\n    criticalhumidity : false,\n    criticaltemp : false,\n    temperatureEvent: \"\",\n    humidityEvent: \"\",\n    turnAC: false // Initialize turn AC variable\n};\n\n\n// Check if temperature is within the acceptable range\nif (temperature < minTemperature) {\n    // Temperature is below the acceptable range\n    data.temperatureEvent = \"Below Min\";\n} else if (temperature > maxTemperature) {\n    // Temperature is above the acceptable range\n    data.temperatureEvent = \"Above Max\";\n    \n}\nelse if (temperature > criticatemp) {\n    // Humidity is above the acceptable range\n    data.criticaltemp= true;\n    }\nelse {\n        msg.payload.temperatureEvent = \"No action\"\n    }\n// Check if humidity is within the acceptable range\nif (humidity < minHumidity) {\n    // Humidity is below the acceptable range\n    data.humidityEvent = \"Below Min\";\n} else if (humidity > maxHumidity) {\n    // Humidity is above the acceptable range\n    data.humidityEvent = \"Above Max\";\n    }\n    \n\nelse {\n        data.humidityEvent = \"No action\"\n    }\n\n// Set turn AC variable based on conditions\nif (data.temperatureEvent === \"Above Max\" || data.humidityEvent === \"Above Max\" || data.criticaltemp==true) {\n    data.turnAC = true; // Turn on AC\n} else {\n    data.turnAC = false; // Turn off AC\n}\n\n\n\n// Return message\nreturn {payload: data};",
+        "func": "// Define the acceptable range for temperature and humidity\nconst minTemperature = 10; // Minimum temperature\nconst maxTemperature = 20; // Maximum temperature\nconst criticatemp = 20; // critical temperature \nconst minHumidity = 30;    // Minimum humidity\nconst maxHumidity = 40;    // Maximum humidity\nconst critichumidity =40; // critical value for humidity\nconst minlux= 30;\nconst maxlux=500;\n// Get the incoming message payload\nvar temperature = global.get('temperature'); // Get temperature from global context\nvar humidity = global.get('humidity'); // Get humidity from global context\nvar lux= global.get('lux'); // get illuminance value\n\n// set global variables that can be used by opc_server\n\n\n// Initialize payload as a JSON object\nvar  data = {\n    timestamp: Date.now(),\n    temperature: temperature,\n    humidity: humidity,\n    criticalhumidity : false,\n    criticaltemp : false,\n    temperatureEvent: \"\",\n    humidityEvent: \"\",\n    turnlighton: false,\n    turnlightoff: false,\n    turnAC: false // Initialize turn AC variable\n};\n\n\n// Check if temperature is within the acceptable range\nif (temperature < minTemperature) {\n    // Temperature is below the acceptable range\n    data.temperatureEvent = \"Below Min\";\n} else if (temperature > maxTemperature && temperature > criticatemp) {\n    // Temperature is above the acceptable range\n    data.temperatureEvent = \"Above Max\";\n    data.criticaltemp= true;\n}\nelse if (temperature > maxTemperature && temperature < criticatemp) {\n    // Humidity is above the acceptable range\n    data.temperatureEvent = \"Above Max\";\n    data.criticaltemp= false;\n    }\nelse {\n        msg.payload.temperatureEvent = \"No action\"\n    }\n// Check if humidity is within the acceptable range\nif (humidity < minHumidity) {\n    // Humidity is below the acceptable range\n    data.humidityEvent = \"Below Min\";\n} else if (humidity > maxHumidity && humidity > critichumidity) {\n    // Humidity is above the acceptable range\n    data.humidityEvent = \"Above Max\";\n    data.criticalhumidity = true;\n\n    }\nelse if (humidity > maxHumidity && humidity <critichumidity) {\n    // Humidity is above the acceptable range\n    data.humidityEvent = \"Above Max\";\n    data.criticalhumidity = false;\n\n} \n\nelse {\n        data.humidityEvent = \"No action\"\n    }\n\n// Set turn AC variable based on conditions\nif (data.temperatureEvent === \"Above Max\" || data.humidityEvent === \"Above Max\" || data.criticaltemp==true) {\n    data.turnAC = true; // Turn on AC\n} else {\n    data.turnAC = false; // Turn off AC\n}\nif (lux > minlux) {\n    data.turnlighton = true; // Turn on AC\n} else {\n    data.turnlightoff = true; // Turn off AC\n}\n\n\n\n// Return message\nreturn {payload: data};",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -436,19 +446,20 @@
         "finalize": "",
         "libs": [],
         "x": 340,
-        "y": 660,
+        "y": 820,
         "wires": [
             [
-                "c30f220d9f8f57af",
-                "2e2d11dc8c879b17",
-                "de607af13c5134a0",
-                "20c1b3c67b6dcd17",
-                "fa107051b12614c0"
+                "55e76222fa58a971",
+                "f32a35d9c355b4c4",
+                "282f350354d5246d",
+                "4b40f513c0f99b4f",
+                "ab12c29ae336b6f6",
+                "074c4f8b6e36bea3"
             ]
         ]
     },
     {
-        "id": "c30f220d9f8f57af",
+        "id": "55e76222fa58a971",
         "type": "csv",
         "z": "f7a852575a507e30",
         "name": "",
@@ -462,16 +473,16 @@
         "strings": true,
         "include_empty_strings": false,
         "include_null_values": false,
-        "x": 550,
-        "y": 660,
+        "x": 570,
+        "y": 820,
         "wires": [
             [
-                "4eecbf50ba453b9f"
+                "44db8b47041d0ac9"
             ]
         ]
     },
     {
-        "id": "4eecbf50ba453b9f",
+        "id": "44db8b47041d0ac9",
         "type": "file",
         "z": "f7a852575a507e30",
         "d": true,
@@ -483,13 +494,13 @@
         "overwriteFile": "false",
         "encoding": "none",
         "x": 780,
-        "y": 660,
+        "y": 820,
         "wires": [
             []
         ]
     },
     {
-        "id": "f9bc82a6ad3ddf13",
+        "id": "ad56cc78665aaf47",
         "type": "inject",
         "z": "f7a852575a507e30",
         "name": "Simulate Data",
@@ -506,15 +517,15 @@
         "payload": "",
         "payloadType": "date",
         "x": 100,
-        "y": 660,
+        "y": 820,
         "wires": [
             [
-                "ecad05a705fec415"
+                "1228e24583e175b4"
             ]
         ]
     },
     {
-        "id": "2e2d11dc8c879b17",
+        "id": "f32a35d9c355b4c4",
         "type": "debug",
         "z": "f7a852575a507e30",
         "name": "object containing_data_and_events",
@@ -527,25 +538,25 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 680,
-        "y": 740,
+        "y": 900,
         "wires": []
     },
     {
-        "id": "bfb44c309a89d080",
+        "id": "91bde4f062b37b72",
         "type": "comment",
         "z": "f7a852575a507e30",
         "name": "sending notifications to2",
         "info": "",
         "x": 100,
-        "y": 740,
+        "y": 900,
         "wires": []
     },
     {
-        "id": "de607af13c5134a0",
+        "id": "282f350354d5246d",
         "type": "function",
         "z": "f7a852575a507e30",
         "name": "check_critical_temperature_trigger",
-        "func": "var inputObject = msg.payload;\n\nvar criticalTemperature = inputObject.criticaltemp;\nvar criticalHumidity = inputObject.criticalhumidity;\n\nif (criticalTemperature || criticalHumidity) {\n    // If either critical temperature or critical humidity is true\n    msg.payload = \"Critical temperature or humidity condition is met.\";\n    return msg;\n} else {\n    // If neither critical temperature nor critical humidity is true\n    msg.payload = \"Critical conditions are not met.\";\n}\n\n",
+        "func": "msg.topic=\"node-red-notification\"\nvar inputObject = msg.payload;\n\nvar criticalTemperature = inputObject.criticaltemp;\nvar criticalHumidity = inputObject.criticalhumidity;\n\n// Define the interval time in milliseconds (e.g., 10 minutes = 600000 ms)\nvar intervalTime = 600000;\n\nif (criticalTemperature || criticalHumidity) {\n    // Get the current time\n    var currentTime = Date.now();\n\n    // Get the last sent time from the global context, defaulting to 0 if not set\n    var lastSentTime = context.global.get('lastSentTime') || 0;\n\n    // Check if the interval has passed since the last message was sent\n    if (currentTime - lastSentTime > intervalTime) {\n        // Update the last sent time in the global context\n        context.global.set('lastSentTime', currentTime);\n\n        // Set the message payload to indicate critical conditions\n        msg.payload = \"Critical temperature or humidity condition is met.\";\n        return msg;\n    } else {\n        // Interval has not passed, do not send a message\n        return null;\n    }\n} else {\n    // Critical conditions are not met, do not send a message\n    return null;\n}\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -553,16 +564,16 @@
         "finalize": "",
         "libs": [],
         "x": 320,
-        "y": 820,
+        "y": 980,
         "wires": [
             [
-                "e61c7fc50d9f5291",
-                "3b85f7b094d655e3"
+                "b9cb8edb48a854d6",
+                "ee5afacd79cfb293"
             ]
         ]
     },
     {
-        "id": "e61c7fc50d9f5291",
+        "id": "b9cb8edb48a854d6",
         "type": "debug",
         "z": "f7a852575a507e30",
         "name": "trigger_conditions",
@@ -575,48 +586,48 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 790,
-        "y": 820,
+        "y": 980,
         "wires": []
     },
     {
-        "id": "3b85f7b094d655e3",
+        "id": "7c71dc1e8608ec66",
         "type": "e-mail",
         "z": "f7a852575a507e30",
-        "server": "smtp.gmail.com",
-        "port": "465",
+        "server": "mail.gmx.net",
+        "port": "587",
         "authtype": "BASIC",
         "saslformat": true,
         "token": "oauth2Response.access_token",
-        "secure": true,
+        "secure": false,
         "tls": true,
-        "name": "waelkhlifi12@gmail.com",
+        "name": "node-redpi@gmx.de",
         "dname": "notification_temperature",
-        "x": 610,
-        "y": 900,
+        "x": 890,
+        "y": 1060,
         "wires": []
     },
     {
-        "id": "466f2a15f7ea6ef4",
+        "id": "7b499b1e30d508f2",
         "type": "comment",
         "z": "f7a852575a507e30",
         "name": "OPC_UA_SERVER",
         "info": "",
         "x": 90,
-        "y": 960,
+        "y": 1120,
         "wires": []
     },
     {
-        "id": "d567823a7b9e07a5",
+        "id": "c0be9f9928fc7632",
         "type": "comment",
         "z": "f7a852575a507e30",
         "name": "LOGIC_ENGINE",
         "info": "",
         "x": 80,
-        "y": 600,
+        "y": 760,
         "wires": []
     },
     {
-        "id": "20c1b3c67b6dcd17",
+        "id": "4b40f513c0f99b4f",
         "type": "function",
         "z": "f7a852575a507e30",
         "name": "set temperature event as global var",
@@ -628,15 +639,15 @@
         "finalize": "",
         "libs": [],
         "x": 620,
-        "y": 560,
+        "y": 720,
         "wires": [
             [
-                "89709a80b5152bb9"
+                "23f018eb4e69ad8f"
             ]
         ]
     },
     {
-        "id": "89709a80b5152bb9",
+        "id": "23f018eb4e69ad8f",
         "type": "debug",
         "z": "f7a852575a507e30",
         "name": "temp_event",
@@ -649,15 +660,15 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 840,
-        "y": 560,
+        "y": 720,
         "wires": []
     },
     {
-        "id": "fa107051b12614c0",
+        "id": "ab12c29ae336b6f6",
         "type": "function",
         "z": "f7a852575a507e30",
         "name": "set humidity event as global var",
-        "func": "msg.payload= msg.payload.criticalhumidity;\nglobal.set(\"critical_humidity\", msg.payload);\n\nreturn msg;\nreturn msg;",
+        "func": "msg.payload= msg.payload.criticalhumidity;\nglobal.set(\"critical_humidity\", msg.payload);\n\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -665,15 +676,15 @@
         "finalize": "",
         "libs": [],
         "x": 640,
-        "y": 480,
+        "y": 640,
         "wires": [
             [
-                "1fa402145eb0e69a"
+                "6022f60746823b1b"
             ]
         ]
     },
     {
-        "id": "1fa402145eb0e69a",
+        "id": "6022f60746823b1b",
         "type": "debug",
         "z": "f7a852575a507e30",
         "name": "humd_event",
@@ -686,21 +697,21 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 850,
-        "y": 480,
+        "y": 640,
         "wires": []
     },
     {
-        "id": "7980a2a5b89e84e5",
+        "id": "d820ba9550176f98",
         "type": "comment",
         "z": "f7a852575a507e30",
         "name": "mqtt interface",
         "info": "",
         "x": 70,
-        "y": 1200,
+        "y": 1360,
         "wires": []
     },
     {
-        "id": "5282dfda6620b9fb",
+        "id": "165ee36c7936fd3b",
         "type": "inject",
         "z": "f7a852575a507e30",
         "name": "Simulate Data",
@@ -717,15 +728,15 @@
         "payload": "",
         "payloadType": "date",
         "x": 100,
-        "y": 1260,
+        "y": 1420,
         "wires": [
             [
-                "0fe35d1b2a540832"
+                "28d942c8e782ec3b"
             ]
         ]
     },
     {
-        "id": "0fe35d1b2a540832",
+        "id": "28d942c8e782ec3b",
         "type": "function",
         "z": "f7a852575a507e30",
         "name": "Check Temperature and Humidity",
@@ -737,15 +748,15 @@
         "finalize": "",
         "libs": [],
         "x": 340,
-        "y": 1260,
+        "y": 1420,
         "wires": [
             [
-                "c1091735ca285d69"
+                "662f99966cc693f7"
             ]
         ]
     },
     {
-        "id": "c1091735ca285d69",
+        "id": "662f99966cc693f7",
         "type": "mqtt out",
         "z": "f7a852575a507e30",
         "name": "",
@@ -759,31 +770,21 @@
         "expiry": "",
         "broker": "ff246c28cc0fa0af",
         "x": 610,
-        "y": 1260,
+        "y": 1420,
         "wires": []
     },
     {
-        "id": "f6bf295aa617b02b",
-        "type": "comment",
-        "z": "f7a852575a507e30",
-        "name": "bluetooth_interface",
-        "info": "",
-        "x": 90,
-        "y": 40,
-        "wires": []
-    },
-    {
-        "id": "dedbc6e23317279f",
+        "id": "02ad7c1d784ec55a",
         "type": "comment",
         "z": "f7a852575a507e30",
         "name": "access control",
         "info": "",
         "x": 70,
-        "y": 1340,
+        "y": 1520,
         "wires": []
     },
     {
-        "id": "31ec4c45c73f9a62",
+        "id": "f0e9fba8eeb0035a",
         "type": "pythonshell in",
         "z": "f7a852575a507e30",
         "name": "acces_control",
@@ -791,17 +792,17 @@
         "virtualenv": "",
         "continuous": false,
         "stdInData": false,
-        "x": 500,
-        "y": 1500,
+        "x": 840,
+        "y": 1700,
         "wires": [
             [
-                "c393e69e192ddee4",
-                "d9719971f74795d2"
+                "7515cf215ca0fe11",
+                "a7da26cd935a805f"
             ]
         ]
     },
     {
-        "id": "0b4cd8f300dba0f0",
+        "id": "59c555b0fd60e027",
         "type": "mqtt in",
         "z": "f7a852575a507e30",
         "name": "",
@@ -814,71 +815,73 @@
         "rh": 0,
         "inputs": 0,
         "x": 130,
-        "y": 1440,
+        "y": 1620,
         "wires": [
             [
-                "387370e20971acb9",
-                "4647ed22238b30a5"
+                "9c0e4e1eef91e0a6",
+                "9701ea8252c63d27"
             ]
         ]
     },
     {
-        "id": "387370e20971acb9",
+        "id": "9c0e4e1eef91e0a6",
         "type": "debug",
         "z": "f7a852575a507e30",
-        "name": "debug 4",
+        "name": "access_command",
         "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 300,
-        "y": 1540,
+        "x": 170,
+        "y": 1680,
         "wires": []
     },
     {
-        "id": "c393e69e192ddee4",
+        "id": "7515cf215ca0fe11",
         "type": "debug",
         "z": "f7a852575a507e30",
-        "name": "debug 5",
+        "name": "image_quality_output_value",
         "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 780,
-        "y": 1440,
+        "x": 1080,
+        "y": 1700,
         "wires": []
     },
     {
-        "id": "4647ed22238b30a5",
+        "id": "7383d66e8324869d",
         "type": "function",
         "z": "f7a852575a507e30",
-        "name": "function 1",
-        "func": "if (msg.payload= true) {\nreturn msg;\n}",
+        "name": "check_image_quality_condition",
+        "func": " if (msg.payload= true) {\nreturn msg;\n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 300,
-        "y": 1360,
+        "x": 630,
+        "y": 1560,
         "wires": [
             [
-                "31ec4c45c73f9a62"
+                "f0e9fba8eeb0035a"
             ]
         ]
     },
     {
-        "id": "d9719971f74795d2",
+        "id": "a7da26cd935a805f",
         "type": "function",
         "z": "f7a852575a507e30",
-        "name": "function 2",
+        "name": "sets_access_as_global_event",
         "func": "global.set(\"access\", msg.payload);\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
@@ -886,33 +889,34 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 600,
-        "y": 1380,
+        "x": 910,
+        "y": 1560,
         "wires": [
             [
-                "80ea49b43e3c0010",
-                "497b1fcd6874f3ab"
+                "ac37a260b268acee",
+                "2b705a94b04d318c"
             ]
         ]
     },
     {
-        "id": "80ea49b43e3c0010",
+        "id": "ac37a260b268acee",
         "type": "debug",
         "z": "f7a852575a507e30",
-        "name": "debug 6",
+        "name": "access_event_value",
         "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 980,
-        "y": 1420,
+        "x": 1240,
+        "y": 1700,
         "wires": []
     },
     {
-        "id": "497b1fcd6874f3ab",
+        "id": "2b705a94b04d318c",
         "type": "mqtt out",
         "z": "f7a852575a507e30",
         "name": "",
@@ -925,8 +929,173 @@
         "correl": "",
         "expiry": "",
         "broker": "ff246c28cc0fa0af",
-        "x": 930,
-        "y": 1380,
+        "x": 1170,
+        "y": 1560,
+        "wires": []
+    },
+    {
+        "id": "074c4f8b6e36bea3",
+        "type": "function",
+        "z": "f7a852575a507e30",
+        "name": "set light event as global var",
+        "func": "var lighton= msg.payload.turnlighton;\nvar lightoff =msg.payload.turnlightoff;\nglobal.set(\"light_is_on\", lighton);\nglobal.set(\"light_is_off\", lightoff);\n\n\nreturn lighton,lightoff;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 580,
+        "wires": [
+            [
+                "59cc2308c89a6a75"
+            ]
+        ]
+    },
+    {
+        "id": "59cc2308c89a6a75",
+        "type": "debug",
+        "z": "f7a852575a507e30",
+        "name": "light_event",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "dcac238a86f256a9",
+        "type": "inject",
+        "z": "f7a852575a507e30",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 80,
+        "y": 1020,
+        "wires": [
+            [
+                "282f350354d5246d"
+            ]
+        ]
+    },
+    {
+        "id": "ee5afacd79cfb293",
+        "type": "trigger",
+        "z": "f7a852575a507e30",
+        "name": "email_trigger",
+        "op1": "1",
+        "op2": "0",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "250",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 390,
+        "y": 1080,
+        "wires": [
+            [
+                "84782a8eed5c556f"
+            ]
+        ]
+    },
+    {
+        "id": "84782a8eed5c556f",
+        "type": "function",
+        "z": "f7a852575a507e30",
+        "name": "function 1",
+        "func": "msg.topic=\"node-red-notification\";\nmsg.payload=\" critical values reached\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 1080,
+        "wires": [
+            [
+                "7c71dc1e8608ec66"
+            ]
+        ]
+    },
+    {
+        "id": "9701ea8252c63d27",
+        "type": "function",
+        "z": "f7a852575a507e30",
+        "name": "check_access_command",
+        "func": " if (msg.payload= true) {\nreturn msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 1560,
+        "wires": [
+            [
+                "9befc7901ca0a446"
+            ]
+        ]
+    },
+    {
+        "id": "9befc7901ca0a446",
+        "type": "pythonshell in",
+        "z": "f7a852575a507e30",
+        "name": "image_quality",
+        "pyfile": "/home/waelkh12/Desktop/tf_lite_face_reco/facial_recognition_for_access_control/face_image_quality/face_image_quality.py",
+        "virtualenv": "",
+        "continuous": false,
+        "stdInData": false,
+        "x": 380,
+        "y": 1720,
+        "wires": [
+            [
+                "7383d66e8324869d",
+                "89b673723d08d7bd"
+            ]
+        ]
+    },
+    {
+        "id": "89b673723d08d7bd",
+        "type": "debug",
+        "z": "f7a852575a507e30",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 510,
+        "y": 1780,
         "wires": []
     }
 ]
