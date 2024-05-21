@@ -78,13 +78,14 @@
         "virtualenv": "",
         "continuous": true,
         "stdInData": false,
-        "x": 70,
-        "y": 240,
+        "x": 110,
+        "y": 260,
         "wires": [
             [
                 "beb41cc912f41cc6",
                 "8c79dfb9635bfca3",
-                "eda7e98a63d3a7c7"
+                "eda7e98a63d3a7c7",
+                "2021590c4f21dd10"
             ]
         ]
     },
@@ -1096,6 +1097,95 @@
         "statusType": "auto",
         "x": 510,
         "y": 1780,
+        "wires": []
+    },
+    {
+        "id": "2021590c4f21dd10",
+        "type": "string",
+        "z": "f7a852575a507e30",
+        "name": "",
+        "methods": [
+            {
+                "name": "between",
+                "params": [
+                    {
+                        "type": "str",
+                        "value": "temp 24.58 \\xc2\\xb0C\\x00\\x00\\x00\\x00\\x00\\x00' b'Humidity  56.42 %\\x00\\x00\\x00' b'lux   "
+                    },
+                    {
+                        "type": "str",
+                        "value": "0"
+                    }
+                ]
+            }
+        ],
+        "prop": "payload",
+        "propout": "payload",
+        "object": "msg",
+        "objectout": "msg",
+        "x": 270,
+        "y": 400,
+        "wires": [
+            [
+                "219553937d11b85d"
+            ]
+        ]
+    },
+    {
+        "id": "219553937d11b85d",
+        "type": "function",
+        "z": "f7a852575a507e30",
+        "name": "convert humidity to a number",
+        "func": "msg.payload = parseFloat(msg.payload); // Convert string to float\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 400,
+        "wires": [
+            [
+                "e6e2afcb46f52f61"
+            ]
+        ]
+    },
+    {
+        "id": "e6e2afcb46f52f61",
+        "type": "function",
+        "z": "f7a852575a507e30",
+        "name": "set humidity as global variable",
+        "func": "global.set(\"lux\", msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 400,
+        "wires": [
+            [
+                "de13067caa7e31f1"
+            ]
+        ]
+    },
+    {
+        "id": "de13067caa7e31f1",
+        "type": "debug",
+        "z": "f7a852575a507e30",
+        "name": "lux_global_variable",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 930,
+        "y": 400,
         "wires": []
     }
 ]
